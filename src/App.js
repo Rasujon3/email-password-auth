@@ -1,6 +1,8 @@
 import {
   createUserWithEmailAndPassword,
   getAuth,
+  sendEmailVerification,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -63,15 +65,29 @@ function App() {
           console.log(user);
           setEmail("");
           setPassword("");
+          verifyEmail();
         })
         .catch((error) => {
           console.error(error);
           setError(error.message);
         });
-      console.log("from submitted", email, password);
     }
+    console.log(email, password);
     event.preventDefault();
   };
+
+  const handlePasswordReset = () => {
+    sendPasswordResetEmail(auth, email).then(() => {
+      console.log("Email sent");
+    });
+  };
+
+  const verifyEmail = () => {
+    sendEmailVerification(auth.currentUser).then(() => {
+      console.log("Email Verification Sent");
+    });
+  };
+
   return (
     <div>
       <div className="registration w-50 mx-auto mt-5">
@@ -94,7 +110,6 @@ function App() {
               Please provide a valid email.
             </Form.Control.Feedback>
           </Form.Group>
-
           <Form.Group className="mb-3" controlId="formBasicPassword">
             <Form.Label>Password</Form.Label>
             <Form.Control
@@ -115,7 +130,10 @@ function App() {
             />
           </Form.Group>
           <p className="text-danger">{error}</p>
-
+          <Button onClick={handlePasswordReset} variant="link">
+            Forget Password?
+          </Button>{" "}
+          <br />
           <Button variant="primary" type="submit">
             {registered ? "Login" : "Register"}
           </Button>
